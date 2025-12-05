@@ -3,43 +3,19 @@ pipeline {
 
     environment {
         DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds')
-        IMAGE_NAME = "mujaheed00/python-app"
+        IMAGE_NAME = "your-image-name"
     }
 
     stages {
-
-        stage('Clone Repository') {
+        stage("Checkout") {
             steps {
-                echo "Cloning repo..."
-                git branch: 'main',
-                    url: 'https://github.com/mujaheed00/Python-app.git'
+                git branch: 'main', url: 'https://github.com/chauhan46/Python-app.git'
             }
         }
 
-        stage('Build Docker Image') {
+        stage("Build") {
             steps {
-                echo "Building Docker image..."
-                sh """
-                    docker build -t ${IMAGE_NAME}:latest .
-                """
-            }
-        }
-
-        stage('Docker Login') {
-            steps {
-                echo "Logging into Docker Hub..."
-                sh """
-                    echo ${DOCKERHUB_CREDENTIALS_PSW} | docker login -u ${DOCKERHUB_CREDENTIALS_USR} --password-stdin
-                """
-            }
-        }
-
-        stage('Push Image') {
-            steps {
-                echo "Pushing Docker image..."
-                sh """
-                    docker push ${IMAGE_NAME}:latest
-                """
+                sh 'echo Building...'
             }
         }
     }
@@ -48,9 +24,12 @@ pipeline {
         always {
             script {
                 echo "Pipeline finished!"
-                sh "docker images"
+
+                // ✔ Wrap post actions inside node if you use sh
+                node {
+                    sh "echo Cleanup step running..."
+                }
             }
         }
     }
 }
-
